@@ -40,7 +40,7 @@ function static(done){
 }
 
 function build(done) {
-	static(()=>{console.log("Static Done")})
+	// static(()=>{console.log("Static Done")})
 
 	var siteBuilder = new SiteBuilder(options)
 	siteBuilder.loadPosts("skills")

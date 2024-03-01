@@ -3,6 +3,7 @@
 
 <head>
 	<title>{{site.title}} | {{title}}</title>
+	<link rel="stylesheet" href="{{site.root}}static/bootstrap/css/bootstrap.min.css">
 </head>
 
 <body>
@@ -11,6 +12,9 @@
 	{{/each}}
 	<h1>{{title}}</h1>
 	{{{body}}}
+
+	<script type="text/javascript" src="{{site.root}}static/jquery/jquery.js"></script>
+	<script type="text/javascript" src="{{site.root}}static/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
