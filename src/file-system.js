@@ -47,4 +47,20 @@ function write(file, data){
 	fs.writeFileSync(file, data)
 }
 
-module.exports = { ls, cat, write }
+function rm(dir){
+	fs.rmSync(dir, {recursive:true, force:true})
+}
+
+function mv(src, dest){
+
+}
+
+function cp(src, dest){
+
+}
+
+function mkdir(dir){
+
+}
+
+module.exports = { ls, cat, write, mv, cp, mkdir, rm }
