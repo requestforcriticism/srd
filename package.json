@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "node index.js",
     "watch": "nodemon -e md,hbs -x \"npm run build\"",
-    "serve": "serve ./dest"
+    "serve": "serve ./docs"
   },
   "author": "",
   "license": "ISC",

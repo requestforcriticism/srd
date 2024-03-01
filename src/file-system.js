@@ -56,7 +56,7 @@ function mv(src, dest){
 }
 
 function cp(src, dest){
-
+	fs.cpSync(src, dest, { recursive: true })
 }
 
 function mkdir(dir){

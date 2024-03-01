@@ -13,7 +13,13 @@ const default_options = {
 
 class SiteBuilder {
 
-	#meta = {}
+	#meta = {
+		tags: [],
+		categories: []
+	}
+
+	#tags = []
+
 	#options = { ...default_options }
 	constructor(options) {
 		if (options) {
@@ -48,11 +54,26 @@ class SiteBuilder {
 			page.data.title = page.data.title || path.basename(p).replace(/\.md$/, "")
 			page.data.href = page.data.href || p.replace(/\.md$/, ".html").replace(/\s+/g, "-").replace(/\\/g, "/")
 
-			this.#meta.pages.push({
+			var pageRef = {
 				...page.data,
 				content: page.content
-			})
+			}
+			this.#meta.pages.push(pageRef)
 
+			// if(page.data.categories){
+			// 	for(var c of page.data.categories){
+			// 		this.#meta.categories[c] = this.#meta.categories[c] || []
+			// 		this.#meta.categories[c].push(pageRef)
+			// 	}
+			// }
+
+			// if(page.data.tags){
+			// 	for(var t of page.data.tags){
+			// 		this.#meta.tags[t] = this.#meta.tags[t] || []
+			// 		this.#meta.tags[t].push(pageRef)
+			// 	}
+			// }
+			
 			this.#meta.nav.push({
 				href: page.data.href,
 				title: page.data.title
@@ -71,10 +92,36 @@ class SiteBuilder {
 	
 			post.data.title = post.data.title || path.basename(p).replace(/\.md$/, "")
 			post.data.href = post.data.href || postFolder + "/" + p.replace(/\.md$/, ".html").replace(/\s+/g, "-").replace(/\\/g, "/")
-			this.#meta[postFolder].push({
+
+
+			var postRef = {
 				...post.data,
 				content: post.content
-			})
+			}
+			this.#meta[postFolder].push(postRef)
+
+			if(post.data.category){
+				for(var c of post.data.category){
+					// this.#meta.categories[c] = this.#meta.categories[c] || []
+					//need this ugliness because tags may match part of the array prototype
+					//ex ["map"] and ["some"] match existing arr lib functions
+					this.#meta.categories[c] = (this.#meta.categories[c] && Array.isArray(this.#meta.categories[c])) ? this.#meta.categories[c] : []
+					this.#meta.categories[c].push(post.data)
+					// console.log(this.#meta.categories)
+				}
+			}
+
+			if(post.data.tags){
+				for(var t of post.data.tags){
+					// this.#meta.tags[t] = this.#meta.tags[t] || []
+					//need this ugliness because tags may match part of the array prototype
+					//ex ["map"] and ["some"] match existing arr lib functions
+					this.#meta.tags[t] = (this.#meta.tags[t] && Array.isArray(this.#meta.tags[t])) ? this.#meta.tags[t] : []
+					this.#meta.tags[t].push(post.data)
+					// console.log(this.#meta.tags)
+				}
+			}
+
 		}
 	}
 
@@ -103,6 +150,13 @@ class SiteBuilder {
 
 	getMeta() {
 		return this.#meta
+	}
+
+	updateMeta(data){
+		this.#meta = {
+			...this.#meta,
+			...data
+		}
 	}
 
 }

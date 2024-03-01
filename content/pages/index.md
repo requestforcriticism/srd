@@ -1,3 +1,7 @@
+---
+title: Home
+---
+
 # Welcome to {{site.title}}
 
 ## hosted on {{site.root}}
@@ -14,6 +18,10 @@ some code test
 ```
 
 
-mer
+mermer
 
 words worlds
+
+some new deltas
+
+another
