@@ -14,8 +14,8 @@ const default_options = {
 class SiteBuilder {
 
 	#meta = {
-		tags: [],
-		categories: []
+		tags: {},
+		categories: {}
 	}
 
 	#tags = []
@@ -81,6 +81,43 @@ class SiteBuilder {
 		}
 	}
 
+	splitNavPaths(){
+		var nav = []
+		for(var n of this.#meta.nav){
+			var pathSplit = n.href.split("/")
+			//surface level page
+			if(pathSplit.length == 1){
+				nav.push({
+					...n,
+					page: "page"
+				})
+			} else if(pathSplit.length == 2){
+				var baseDropdown = {
+					dropdown: "dropdown",
+					title: pathSplit[0],
+					pages: []
+				}
+				// nav[pathSplit[0]] = (!Array.isArray(nav[pathSplit[0]])) ? baseDropdown : nav[pathSplit[0]]
+				nav[pathSplit[0]] = nav[pathSplit[0]] || baseDropdown
+				// nav[pathSplit[0]] = (nav[pathSplit[0]] && Array.isArray(nav[pathSplit[0]])) ? nav[pathSplit[0]] : baseDropdown
+				nav[pathSplit[0]].pages.push({
+					...n,
+					page: "page"
+				})
+				// console.log(nav)
+			}
+			//ignore anything deeper than that
+
+			
+		}
+		var newNav = []
+		for(var i in nav){
+			newNav.push(nav[i])
+		}
+		this.#meta.nav = newNav
+		
+	}
+
 	loadPosts(postFolder){
 		postFolder = postFolder || "posts"
 		this.#meta[postFolder] = this.#meta[postFolder] || []
@@ -125,10 +162,56 @@ class SiteBuilder {
 		}
 	}
 
+	writeTagsPages(tagsDir){
+		var tagPageTemplate = Renderer.load(path.join(this.#options.content_dir, "templates", "tag.md"))
+		// console.log(tagPageTemplate)
+		for(var t in this.#meta.tags){
+			var tagPageHtml = Renderer.page(tagPageTemplate.content, this.#meta, tagPageTemplate.data, {
+				post: this.#meta.tags[t],
+				title: t
+			})
+			// console.log(tagPageHtml)
+			var fileHtml = Renderer.template(path.join(this.#options.theme_dir, this.#options.theme, "layout.hbs"), this.#meta, {
+				// tags: tags,
+				body: tagPageHtml,
+				nav: this.#meta.nav,
+				title: "Tag:" + t
+			})
+			write(path.join(this.#options.build_dir, tagsDir, t+ ".html"), fileHtml)
+
+		}
+	}
+
+	writeCategoryPages(catDir){
+		var catPageTemplate = Renderer.load(path.join(this.#options.content_dir, "templates", "category.md"))
+		// console.log(tagPageTemplate)
+		for(var c in this.#meta.categories){
+			var tagPageHtml = Renderer.page(catPageTemplate.content, this.#meta, catPageTemplate.data, {
+				post: this.#meta.categories[c],
+				title: c
+			})
+			// console.log(tagPageHtml)
+			var fileHtml = Renderer.template(path.join(this.#options.theme_dir, this.#options.theme, "layout.hbs"), this.#meta, {
+				// tags: tags,
+				body: tagPageHtml,
+				nav: this.#meta.nav,
+				title: "Category:" + c
+			})
+			write(path.join(this.#options.build_dir, catDir, c+ ".html"), fileHtml)
+
+		}
+	}
+
 	writePages(){
 		for (var p of this.#meta.pages) {
 			var content = Renderer.page(p.content, this.#meta, p)
+			// var tags = []
+			// for(var i in this.#meta.tags){
+			// 	tags[i] = this.#meta.tags[i]
+			// }
+			// // console.log(tags)
 			var fileHtml = Renderer.template(path.join(this.#options.theme_dir, this.#options.theme, "layout.hbs"), this.#meta, p, {
+				// tags: tags,
 				body: content,
 				nav: this.#meta.nav
 			})

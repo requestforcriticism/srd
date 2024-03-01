@@ -35,6 +35,8 @@ function jquery(done){
 }
 
 function static(done){
+	bootstrap(()=>{console.log("Bootstrap Done")})
+	jquery(()=>{console.log("JQuery Done")})
 	cp("./themes/default/static", options.build_dir + "/static")
 	done()
 }
@@ -45,18 +47,25 @@ function build(done) {
 	var siteBuilder = new SiteBuilder(options)
 	siteBuilder.loadPosts("skills")
 	siteBuilder.loadPosts("feats")
-	siteBuilder.updateMeta({
-		site: {
-			root: "http://localhost:3000/",
-			title: "DEV SITE"
-		}
-	})
+	// siteBuilder.updateMeta({
+	// 	site: {
+	// 		root: "http://localhost:3000/",
+	// 		title: "DEV SITE",
+	// 		// long_tab_page: true,
+	// 		// long_category_page: true
+	// 	}
+	// })
+	siteBuilder.splitNavPaths()
 	siteBuilder.writePages()
 	siteBuilder.writePosts()
 	siteBuilder.writePosts("skills")
 	siteBuilder.writePosts("feats")
-	console.log(siteBuilder.getMeta().tags)
-	console.log(siteBuilder.getMeta().categories)
+
+	siteBuilder.writeTagsPages("tags")
+	siteBuilder.writeCategoryPages("category")
+	// console.log(siteBuilder.getMeta().tags)
+	// console.log(siteBuilder.getMeta())
+	// console.log(siteBuilder.getMeta().categories)
 	done()
 }
 
