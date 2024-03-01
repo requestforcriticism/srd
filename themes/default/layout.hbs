@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>{{site.title}} | {{title}}</title>
+</head>
+
+<body>
+	{{#each nav}}
+	<a href="{{../site.root}}{{href}}">{{title}}</a>
+	{{/each}}
+	<h1>{{title}}</h1>
+	{{{body}}}
+</body>
+
+</html>
