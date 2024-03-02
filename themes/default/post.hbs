@@ -59,12 +59,15 @@
 
 
 	<div class="container">
+		<h2>{{title}}</h2>
+		{{#if page.date}}<p><i>{{page.date}}</i></p>{{/if}}
 		{{{body}}}
+		<p>Category: {{#each page.tags}} <a href="{{../site.root}}tags/{{this}}">{{this}}</a> {{/each}}</p>
+		<p>Tags: {{#each page.category}} <a href="{{../site.root}}category/{{this}}">{{this}}</a> {{/each}}</p>
 	</div>
 
 	<script type="text/javascript" src="{{site.root}}static/jquery/jquery.js"></script>
 	<script type="text/javascript" src="{{site.root}}static/bootstrap/js/bootstrap.bundle.min.js"></script>
-	<script type="text/javascript" src="{{site.root}}static/srd.js"></script>
 </body>
 
 </html>

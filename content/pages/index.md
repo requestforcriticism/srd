@@ -1,5 +1,7 @@
 ---
 title: Home
+layout: home
+nav: false
 ---
 
 # Welcome to {{site.title}}

@@ -47,14 +47,14 @@ function build(done) {
 	var siteBuilder = new SiteBuilder(options)
 	siteBuilder.loadPosts("skills")
 	siteBuilder.loadPosts("feats")
-	// siteBuilder.updateMeta({
-	// 	site: {
-	// 		root: "http://localhost:3000/",
-	// 		title: "DEV SITE",
-	// 		// long_tab_page: true,
-	// 		// long_category_page: true
-	// 	}
-	// })
+	siteBuilder.updateMeta({
+		site: {
+			root: "http://localhost:3000/",
+			title: "RFC/SRD",
+			// long_tab_page: true,
+			// long_category_page: true
+		}
+	})
 	siteBuilder.splitNavPaths()
 	siteBuilder.writePages()
 	siteBuilder.writePosts()

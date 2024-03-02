@@ -1,6 +1,6 @@
 {
 	"site": {
-		"title": "My Website",
+		"title": "RFC/SRD",
 		"root": "https://requestforcriticism.com/srd/",
 		"static": "static"
 	},

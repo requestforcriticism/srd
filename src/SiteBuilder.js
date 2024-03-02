@@ -73,11 +73,15 @@ class SiteBuilder {
 			// 		this.#meta.tags[t].push(pageRef)
 			// 	}
 			// }
-			
-			this.#meta.nav.push({
-				href: page.data.href,
-				title: page.data.title
-			})
+			if(typeof page.data.nav != "undefined" && !page.data.nav){
+
+			} else {
+				this.#meta.nav.push({
+					href: page.data.href,
+					title: page.data.title
+				})
+			}
+
 		}
 	}
 
@@ -223,9 +227,11 @@ class SiteBuilder {
 		postFolder = postFolder || "posts"
 		for(var p of this.#meta[postFolder]){
 			var content = Renderer.page(p.content, this.#meta, p)
-			var fileHtml = Renderer.template(path.join(this.#options.theme_dir, this.#options.theme, "layout.hbs"), this.#meta, p, {
+			var pageLayout = (p.type) ? p.type : "layout"
+			var fileHtml = Renderer.template(path.join(this.#options.theme_dir, this.#options.theme, pageLayout+".hbs"), this.#meta, p, {
 				body: content,
-				nav: this.#meta.nav
+				nav: this.#meta.nav,
+				page: p
 			})
 			write(path.join(this.#options.build_dir, p.href), fileHtml)
 		}
