@@ -3,6 +3,10 @@ const path = require('path')
 
 const { ls, cat, write } = require('./file-system.js')
 const Renderer = require("./renderer.js")
+var DB = require("./db.js");
+
+var pageDb = new DB("test.sqlite")
+pageDb.createTables()
 
 const default_options = {
 	theme: "default",
@@ -59,20 +63,93 @@ class SiteBuilder {
 				content: page.content
 			}
 			this.#meta.pages.push(pageRef)
+			var pageID = pageDb.addPage(page.data.title, page.content).lastInsertRowid
+			// console.log(pageID)
+			
+			// var nav = (page.data.nav != undefined) ? ((page.data.nav) ? 1 : 0) : 1
+			// var nav = () ? -1 : page.data.nav
+			var nav = undefined
+			if(typeof page.data.nav == "boolean"){
+				if(!page.data.nav){
+					nav = -1
+				} else {
+					nav = undefined
+				}
+			} else {
+				nav = page.data.nav
+			}
 
-			// if(page.data.categories){
-			// 	for(var c of page.data.categories){
-			// 		this.#meta.categories[c] = this.#meta.categories[c] || []
-			// 		this.#meta.categories[c].push(pageRef)
+			var pageDbEntry = {
+				title: page.data.title,
+				contents: page.content,
+				nav: nav,
+				layout: page.data.layout || "default",
+				href: page.data.href,
+				date: page.data.date || null,
+				type: page.data.type || null,
+				subtype: page.data.subtype || null,
+				category: page.data.category || "Uncategorized",
+				id: pageID
+			}
+
+			if(page.data.type){
+				this.#meta[page.data.type] = this.#meta[page.data.type] || []
+				var pageRef = {
+					...page.data,
+					...pageDbEntry,
+					content: page.content
+				}
+				this.#meta[page.data.type].push(pageRef)
+			}
+
+			// if(page.data.subtype){
+			// 	this.#meta[page.data.type] = this.#meta[page.data.type] || []
+			// 	var pageRef = {
+			// 		...page.data,
+			// 		...pageDbEntry,
+			// 		content: page.content
 			// 	}
+			// 	this.#meta[page.data.type].push(pageRef)
 			// }
 
-			// if(page.data.tags){
-			// 	for(var t of page.data.tags){
-			// 		this.#meta.tags[t] = this.#meta.tags[t] || []
-			// 		this.#meta.tags[t].push(pageRef)
-			// 	}
-			// }
+			pageDb.updatePage(pageDbEntry)
+
+			if(page.data.tags){
+				for(var t of page.data.tags){
+					// console.log()
+					pageDb.addPageTag(pageID,pageDb.addTag(t))
+				}
+			}
+
+			if(page.data.category){
+				if(typeof page.data.category == "string"){
+					var c = page.data.category
+					this.#meta.categories[c] = (this.#meta.categories[c] && Array.isArray(this.#meta.categories[c])) ? this.#meta.categories[c] : []
+					this.#meta.categories[c].push(page.data)
+				} else {
+					for(var c of page.data.category){
+						// this.#meta.categories[c] = this.#meta.categories[c] || []
+						//need this ugliness because tags may match part of the array prototype
+						//ex ["map"] and ["some"] match existing arr lib functions
+						this.#meta.categories[c] = (this.#meta.categories[c] && Array.isArray(this.#meta.categories[c])) ? this.#meta.categories[c] : []
+						this.#meta.categories[c].push(page.data)
+						// console.log(this.#meta.categories)
+					}
+				}
+
+			}
+
+			if(page.data.tags){
+				for(var t of page.data.tags){
+					// this.#meta.tags[t] = this.#meta.tags[t] || []
+					//need this ugliness because tags may match part of the array prototype
+					//ex ["map"] and ["some"] match existing arr lib functions
+					this.#meta.tags[t] = (this.#meta.tags[t] && Array.isArray(this.#meta.tags[t])) ? this.#meta.tags[t] : []
+					this.#meta.tags[t].push(page.data)
+					// console.log(this.#meta.tags)
+				}
+			}
+
 			if(typeof page.data.nav != "undefined" && !page.data.nav){
 
 			} else {
@@ -168,15 +245,12 @@ class SiteBuilder {
 
 	writeTagsPages(tagsDir){
 		var tagPageTemplate = Renderer.load(path.join(this.#options.content_dir, "templates", "tag.md"))
-		// console.log(tagPageTemplate)
 		for(var t in this.#meta.tags){
 			var tagPageHtml = Renderer.page(tagPageTemplate.content, this.#meta, tagPageTemplate.data, {
 				post: this.#meta.tags[t],
 				title: t
 			})
-			// console.log(tagPageHtml)
 			var fileHtml = Renderer.template(path.join(this.#options.theme_dir, this.#options.theme, "layout.hbs"), this.#meta, {
-				// tags: tags,
 				body: tagPageHtml,
 				nav: this.#meta.nav,
 				title: "Tag:" + t
@@ -188,15 +262,12 @@ class SiteBuilder {
 
 	writeCategoryPages(catDir){
 		var catPageTemplate = Renderer.load(path.join(this.#options.content_dir, "templates", "category.md"))
-		// console.log(tagPageTemplate)
 		for(var c in this.#meta.categories){
 			var tagPageHtml = Renderer.page(catPageTemplate.content, this.#meta, catPageTemplate.data, {
 				post: this.#meta.categories[c],
 				title: c
 			})
-			// console.log(tagPageHtml)
 			var fileHtml = Renderer.template(path.join(this.#options.theme_dir, this.#options.theme, "layout.hbs"), this.#meta, {
-				// tags: tags,
 				body: tagPageHtml,
 				nav: this.#meta.nav,
 				title: "Category:" + c
@@ -209,13 +280,7 @@ class SiteBuilder {
 	writePages(){
 		for (var p of this.#meta.pages) {
 			var content = Renderer.page(p.content, this.#meta, p)
-			// var tags = []
-			// for(var i in this.#meta.tags){
-			// 	tags[i] = this.#meta.tags[i]
-			// }
-			// // console.log(tags)
 			var fileHtml = Renderer.template(path.join(this.#options.theme_dir, this.#options.theme, "layout.hbs"), this.#meta, p, {
-				// tags: tags,
 				body: content,
 				nav: this.#meta.nav
 			})

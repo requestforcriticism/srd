@@ -4,26 +4,28 @@ layout: home
 nav: false
 ---
 
-# Welcome to {{site.title}}
-
-## hosted on {{site.root}}
-
-Here is my stuff. Please do not enjoy
-
-here is some stuff that is added after the nodemon has started
+# RFC/SRD: Welcome to the Solaris Research Database
 
 
-another test without the builder script
 
-```js
-some code test
-```
+### New Players
+
+Insert todo
+
+### Active bounties
+
+- Submitting fixes for minor errors.
+- Fubmitting fixes for major errors.
+
+### Recent Posts
+
+{{#each posts}}
+__[{{title}}]({{../site.root}}{{href\}})__ _{{date}}_ <br/>
+{{#if short}}{{short}}<br/>{{/if}}
+<!-- {{#if category}}Categories: {{#each category}}<a href="{{../../site.root}}category/{{this}}">{{this}}</a> {{/each}} | {{/if}} -->
+<!-- {{#if tags}}Tags: {{#each tags}}<a href="{{../../site.root}}tags/{{this}}">{{this}}</a> {{/each}}{{/if}} -->
+{{/each}}
 
 
-mermer
 
-words worlds
 
-some new deltas
-
-another

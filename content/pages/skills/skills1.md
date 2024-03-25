@@ -1,3 +1,7 @@
+---
+type: skill
+nav: false
+---
 
 <div data-tab-nav="tl"></div>
 
